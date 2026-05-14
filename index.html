@@ -865,6 +865,13 @@
         document.querySelectorAll('h1, h2, h3, p:not(.subtitle), .subtitle, li:not(nav li), th, td').forEach(el => {
             el.setAttribute('contenteditable', 'true');
         });
+
+        // Automatically add fullscreen support to all video iframes
+        document.querySelectorAll('iframe').forEach(iframe => {
+            iframe.setAttribute('allowfullscreen', 'true');
+            iframe.setAttribute('webkitallowfullscreen', 'true');
+            iframe.setAttribute('mozallowfullscreen', 'true');
+        });
     });
 
     // Gemini API Call Feature
