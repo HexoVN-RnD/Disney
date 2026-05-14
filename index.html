@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>R&D Overview: Interactive Games & Future Tech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Montserrat:wght@300;400;500;600;700&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* 1. GLOBAL & SETUP */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #04010a;
+            color: #F1F5F9;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Highlight contenteditable areas on focus */
+        [contenteditable="true"] {
+            outline: none;
+            transition: background-color 0.3s, box-shadow 0.3s;
+            border-radius: 4px;
+        }
+        [contenteditable="true"]:focus {
+            background-color: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+
+        /* 1.1 FIXED BACKGROUNDS */
+        .bg-glows {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(45, 10, 89, 0.7) 0%, transparent 80%),
+                radial-gradient(circle at 15% 85%, rgba(138, 43, 226, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 85% 15%, rgba(255, 215, 0, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 50% -20%, rgba(65, 105, 225, 0.2) 0%, transparent 60%);
+            z-index: -2;
+        }
+
+        .bg-stars {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, #fff, transparent),
+                radial-gradient(3px 3px at 80px 120px, #FFD700, transparent),
+                radial-gradient(2px 2px at 150px 70px, #fff, transparent),
+                radial-gradient(3px 3px at 240px 180px, #8A2BE2, transparent),
+                radial-gradient(2px 2px at 310px 40px, #fff, transparent),
+                radial-gradient(4px 4px at 400px 220px, #FFD700, transparent),
+                radial-gradient(2px 2px at 600px 350px, #4169E1, transparent);
+            background-repeat: repeat;
+            background-size: 350px 350px;
+            opacity: 0.8;
+            z-index: -1;
+            pointer-events: none;
+            animation: twinkle 4s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        /* 1.2 NAVIGATION (Sticky Header) */
+        header {
+            position: fixed;
+            top: 0; left: 0; width: 100%;
+            background: rgba(4, 1, 10, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(138, 43, 226, 0.4);
+            z-index: 100;
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #FFEA70;
+            text-decoration: none;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            gap: 30px;
+        }
+
+        nav a {
+            color: #E2E8F0;
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s, text-shadow 0.3s;
+        }
+
+        nav a:hover {
+            color: #D47BFF;
+            text-shadow: 0 0 10px rgba(224, 86, 253, 0.8);
+        }
+
+        /* 2. LAYOUT CONTAINERS */
+        main {
+            padding-top: 80px;
+            position: relative;
+            z-index: 1;
+        }
+
+        section {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 100px 20px;
+            position: relative;
+        }
+
+        .hero-section {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .section-header hr {
+            background: linear-gradient(90deg, transparent, #FFD700, transparent);
+            border: none;
+            height: 3px;
+            margin: 25px auto;
+            width: 200px;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+        }
+
+        .content-block {
+            margin-bottom: 120px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        .two-column.tiled {
+            align-items: stretch;
+        }
+
+        /* 3. TYPOGRAPHY & GLOW EFFECTS */
+        h1, h2, h3, h4 {
+            color: #FFFFFF;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.9);
+            letter-spacing: 1px;
+        }
+
+        .gold-glow {
+            color: #FFEA70;
+            font-style: italic;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.9), 0 0 25px rgba(255, 165, 0, 0.8), 0 0 45px rgba(255, 140, 0, 0.6), 0 4px 10px rgba(0,0,0,0.8);
+        }
+
+        .purple-glow {
+            color: #D47BFF;
+            text-shadow: 0 0 10px rgba(224, 86, 253, 0.9), 0 0 25px rgba(138, 43, 226, 0.8), 0 0 45px rgba(75, 0, 130, 0.6), 0 4px 10px rgba(0,0,0,0.8);
+        }
+
+        .cyan-glow {
+            color: #5DE2FF;
+            text-shadow: 0 0 10px rgba(93, 226, 255, 0.9), 0 0 25px rgba(93, 226, 255, 0.8), 0 0 45px rgba(65, 105, 225, 0.6), 0 4px 10px rgba(0,0,0,0.8);
+        }
+
+        .code-text {
+            font-family: 'JetBrains Mono', monospace;
+            color: #FFD700;
+            font-size: 15px;
+            background: rgba(138, 43, 226, 0.3);
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
+            display: inline-block;
+            margin-top: 5px;
+        }
+
+        /* Specific Font Sizes */
+        .hero-section h1 { font-size: 80px; line-height: 1.2; margin-bottom: 30px; }
+        .hero-section p.subtitle { font-size: 24px; max-width: 900px; color: #E2E8F0; }
+        .section-header h2 { font-size: 64px; }
+        .section-header p.subtitle { font-size: 20px; max-width: 800px; margin: 0 auto; color: #E2E8F0; }
+        
+        .slide-title { 
+            font-size: 42px; 
+            margin-bottom: 30px; 
+            border-bottom: 2px solid rgba(255, 215, 0, 0.4); 
+            padding-bottom: 10px;
+        }
+        h3 { font-size: 28px; margin-bottom: 15px; }
+        
+        p, li, th, td, .bar .label, .chart-summary {
+            font-size: 18px;
+        }
+
+        /* 4. UI COMPONENTS (Glassmorphism) */
+        .glass-box, .tile {
+            background: linear-gradient(135deg, rgba(30, 10, 60, 0.7), rgba(15, 5, 30, 0.9));
+            border: 1px solid rgba(255, 215, 0, 0.4);
+            border-radius: 20px;
+            padding: 40px;
+            backdrop-filter: blur(15px);
+            box-shadow: inset 0 0 30px rgba(138, 43, 226, 0.3), 0 15px 35px rgba(0,0,0,0.8), 0 0 20px rgba(138, 43, 226, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .glass-box:hover, .tile:hover {
+            border-color: rgba(255, 215, 0, 0.8);
+            box-shadow: inset 0 0 40px rgba(138, 43, 226, 0.5), 0 15px 35px rgba(0,0,0,0.8), 0 0 30px rgba(255, 215, 0, 0.4);
+        }
+
+        ul.styled-list {
+            list-style: none;
+        }
+        ul.styled-list li {
+            padding-left: 32px;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        ul.styled-list li::before {
+            color: #FFD700;
+            content: '✦';
+            font-size: 20px;
+            left: 0;
+            position: absolute;
+            top: 2px;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+        }
+
+        /* Images */
+        .image-wrapper {
+            border-radius: 16px;
+            height: 400px;
+            width: 100%;
+            overflow: hidden;
+            border: 2px solid rgba(255, 215, 0, 0.6);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(138, 43, 226, 0.6), inset 0 0 20px rgba(255, 215, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(10, 5, 25, 0.8);
+            backdrop-filter: blur(10px);
+        }
+        .image-wrapper img {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+        .image-wrapper.contain img {
+            object-fit: contain;
+            padding: 20px;
+        }
+        .image-wrapper.rounded {
+            border-radius: 50%;
+            width: 400px;
+            margin: 0 auto;
+            border: 4px solid #FFD700;
+        }
+        .image-wrapper .icon-placeholder {
+            font-size: 120px;
+            color: #FFEA70;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+        }
+
+        /* Tiled Grid (2 columns for 4 items) */
+        .tiled-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+        }
+        
+        .tile .icon {
+            align-items: center;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(138, 43, 226, 0.3));
+            border: 2px solid rgba(255, 215, 0, 0.7);
+            border-radius: 50%;
+            color: #FFEA70;
+            display: flex;
+            font-size: 30px;
+            height: 75px;
+            justify-content: center;
+            margin-bottom: 25px;
+            width: 75px;
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.4), inset 0 0 15px rgba(138, 43, 226, 0.5);
+        }
+
+        /* Tables */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            border-bottom: 1px solid rgba(255, 215, 0, 0.15);
+            padding: 20px 24px;
+            text-align: left;
+        }
+        th {
+            background-color: rgba(255, 215, 0, 0.15);
+            color: #FFEA70;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.5);
+        }
+        tr:last-child td { border-bottom: none; }
+
+        /* Bar Chart */
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .bar {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .bar .label {
+            flex: 0 0 260px;
+            font-weight: 600;
+            text-align: right;
+        }
+        .bar .bar-inner {
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            flex-grow: 1;
+            height: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            overflow: hidden;
+        }
+        .bar .bar-fill {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            height: 100%;
+            color: #000;
+            font-weight: 700;
+            padding-right: 15px;
+            box-shadow: inset 0 0 20px rgba(255,255,255,0.6);
+        }
+
+        /* 5. AI GENERATOR STYLES */
+        .ai-generator-container {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .ai-input-group {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+        }
+        .ai-input {
+            flex-grow: 1;
+            padding: 15px 25px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(138, 43, 226, 0.6);
+            color: #FFF;
+            font-size: 18px;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+        }
+        .ai-input:focus {
+            outline: none;
+            border-color: #FFEA70;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+        }
+        .ai-button {
+            padding: 15px 35px;
+            border-radius: 12px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #8A2BE2, #D47BFF);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 18px;
+            font-weight: 700;
+            font-family: 'Montserrat', sans-serif;
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.6);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .ai-button:hover {
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.6);
+            transform: translateY(-2px);
+        }
+        .ai-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .ai-output {
+            min-height: 180px;
+            padding: 25px;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            color: #E2E8F0;
+            font-size: 17px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .ai-output strong { color: #FFEA70; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 80px 20px;
+            border-top: 1px solid rgba(138, 43, 226, 0.4);
+            background: rgba(4, 1, 10, 0.8);
+            margin-top: 50px;
+        }
+        footer h2 { font-size: 60px; margin-bottom: 20px; }
+        footer .contact-info {
+            color: #FFEA70;
+            font-size: 20px;
+            margin-top: 30px;
+            font-weight: 700;
+            letter-spacing: 3px;
+        }
+
+        /* Spinner & Animations */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #FFEA70;
+            font-size: 30px;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0) translateX(-50%); }
+            40% { transform: translateY(-20px) translateX(-50%); }
+            60% { transform: translateY(-10px) translateX(-50%); }
+        }
+
+        /* ---------------------------------
+           HERO FLOATING CHARACTERS
+           --------------------------------- */
+        .hero-characters {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            padding: 60px;
+            background: radial-gradient(circle, rgba(4, 1, 10, 0.9) 0%, rgba(4, 1, 10, 0.5) 50%, transparent 80%);
+            border-radius: 50%;
+        }
+        .float-char {
+            position: absolute;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.15), inset 0 0 20px rgba(0,0,0,0.8);
+            animation: floatingHero 6s ease-in-out infinite;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+        }
+        @keyframes floatingHero {
+            0%, 100% { transform: translateY(0px) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+        }
+        
+        /* 6 Character placements */
+        .char-1 { width: 180px; height: 180px; top: 12%; left: 8%; border-color: #42D1F5; box-shadow: 0 0 30px rgba(66, 209, 245, 0.4); animation-delay: 0s; background-image: url('https://placehold.co/180x180/15051e/42D1F5?text=Stitch'); }
+        .char-2 { width: 140px; height: 140px; top: 50%; left: 3%; border-color: #D47BFF; box-shadow: 0 0 30px rgba(212, 123, 255, 0.4); animation-delay: 1.2s; background-image: url('https://placehold.co/140x140/15051e/D47BFF?text=Woody'); }
+        .char-3 { width: 160px; height: 160px; top: 75%; left: 12%; border-color: #FF5A5F; box-shadow: 0 0 30px rgba(255, 90, 95, 0.4); animation-delay: 2.4s; background-image: url('https://placehold.co/160x160/15051e/FF5A5F?text=Alice'); }
+        .char-4 { width: 170px; height: 170px; top: 10%; right: 8%; border-color: #FFB300; box-shadow: 0 0 30px rgba(255, 179, 0, 0.4); animation-delay: 0.5s; background-image: url('https://placehold.co/170x170/15051e/FFB300?text=Simba'); }
+        .char-5 { width: 150px; height: 150px; top: 45%; right: 4%; border-color: #5DE2FF; box-shadow: 0 0 30px rgba(93, 226, 255, 0.4); animation-delay: 1.7s; background-image: url('https://placehold.co/150x150/15051e/5DE2FF?text=Elsa'); }
+        .char-6 { width: 190px; height: 190px; top: 70%; right: 10%; border-color: #FFEA70; box-shadow: 0 0 30px rgba(255, 234, 112, 0.4); animation-delay: 2.9s; background-image: url('https://placehold.co/190x190/15051e/FFEA70?text=Mickey'); }
+
+        /* 6. RESPONSIVE DESIGN (Mobile & Tablet) */
+        @media (max-width: 992px) {
+            .float-char { opacity: 0.4; }
+            .char-1 { width: 100px; height: 100px; top: 5%; }
+            .char-2 { width: 80px; height: 80px; left: -2%; }
+            .char-3 { width: 90px; height: 90px; bottom: 5%; top: auto;}
+            .char-4 { width: 110px; height: 110px; top: 5%;}
+            .char-5 { width: 90px; height: 90px; right: -2%;}
+            .char-6 { width: 120px; height: 120px; bottom: 5%; top: auto;}
+            
+            .two-column, .tiled-content {
+                grid-template-columns: 1fr;
+            }
+            .hero-section h1 { font-size: 50px; }
+            .section-header h2 { font-size: 48px; }
+            .slide-title { font-size: 32px; }
+            .image-wrapper { height: auto; aspect-ratio: 16/9; }
+            .image-wrapper.rounded { width: 100%; max-width: 350px; aspect-ratio: 1/1; height: auto; }
+            .bar { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .bar .label { flex: none; text-align: left; margin-bottom: 5px; }
+            .bar .bar-inner { width: 100%; }
+        }
+
+        @media (max-width: 600px) {
+            header { flex-direction: column; gap: 15px; padding: 15px 20px; }
+            nav ul { gap: 15px; flex-wrap: wrap; justify-content: center; }
+            main { padding-top: 120px; }
+            .ai-input-group { flex-direction: column; }
+            .ai-button { width: 100%; }
+            section { padding: 60px 20px; }
+            .image-wrapper.desktop-invert { order: 0 !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-glows"></div>
+    <div class="bg-stars"></div>
+
+    <header>
+        <a href="#" class="logo">R&D <span style="color: #D47BFF;">Interactive</span></a>
+        <nav>
+            <ul>
+                <li><a href="#disney">Disney Tech</a></li>
+                <li><a href="#control-apps">Control Apps</a></li>
+                <li><a href="#trends">Trends</a></li>
+                <li><a href="#ai-assistant">AI Assistant</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="hero" class="hero-section">
+            <div class="hero-characters">
+                <div class="float-char char-1" title="Lilo & Stitch"></div>
+                <div class="float-char char-2" title="Toy Story"></div>
+                <div class="float-char char-3" title="Alice in Wonderland"></div>
+                <div class="float-char char-4" title="The Lion King"></div>
+                <div class="float-char char-5" title="Frozen"></div>
+                <div class="float-char char-6" title="Mickey & Friends"></div>
+            </div>
+            <div class="hero-content">
+                <h1>R&D PROJECT OVERVIEW<br><span class="gold-glow">Interactive Games</span> & Technology</h1>
+                <p class="subtitle">Core technology analysis report from the Disney "Wonder of Friendship" project and R&D directions (social media reverse-engineering) for future shows.</p>
+            </div>
+            <a href="#disney" class="scroll-indicator"><i class="fa-solid fa-chevron-down"></i></a>
+        </section>
+
+        <section id="disney">
+            <div class="section-header">
+                <h2 class="purple-glow">Part 1: Disney Project</h2>
+                <hr>
+                <p class="subtitle">Breaking down the hardware & software technologies behind the core interactive spaces of "Wonder of Friendship".</p>
+            </div>
+
+            <!-- Block 1.5: Lilo & Stitch - Secrets in the Sand -->
+            <div class="content-block two-column">
+                <div>
+                    <h2 class="slide-title">Lilo & Stitch:<br><span class="gold-glow">Secrets in the Sand</span></h2>
+                    <p style="margin-bottom: 20px;"><strong>Core:</strong> Warm-up experience. Players interact with a virtual sand screen, drawing or making footprints to discover Stitch's surprise appearance.</p>
+                    <ul class="styled-list">
+                        <li><strong>Surface Scanning:</strong> Using 2D Lidar (Hokuyo) placed at the floor edge to create a horizontal "laser curtain", detecting precise touch coordinates on the virtual sand.</li>
+                        <li><strong>Signal Processing:</strong> Point Cloud data is sent via TUIO/OSC protocol to the Media Server.</li>
+                        <li><strong>Physics Simulation:</strong> TouchDesigner or Unreal Engine (Niagara) calculates sand particles being swept away in real-time and maps the image onto the floor.</li>
+                    </ul>
+                </div>
+                <div class="image-wrapper contain" style="background: rgba(255, 234, 112, 0.05); border-color: #FFEA70;"> 
+                    <iframe src="https://drive.google.com/file/d/1dZ19tknidd-Cjk0lxzdgnexsrZ-Crk3P/preview" width="100%" height="100%" style="border: none; border-radius: 14px;" allow="autoplay"></iframe>
+                </div>
+            </div>
+
+            <!-- Block 2: Toy Story -->
+            <div class="content-block two-column">
+                <div class="image-wrapper desktop-invert" style="order: -1; background: rgba(138, 43, 226, 0.05); border-color: #D47BFF;"> 
+                    <iframe src="https://drive.google.com/file/d/1TP0BnqwFfDRoCP1pevJpsDlwR6DWkpWB/preview" width="100%" height="100%" style="border: none; border-radius: 14px;" allow="autoplay"></iframe>
+                </div>
+                <div>
+                    <h2 class="slide-title">Toy Story:<br><span class="purple-glow">Let's Save Woody</span></h2>
+                    <p style="margin-bottom: 20px;"><strong>Core:</strong> Using body movement back and forth to "erase" the giant Etch-A-Sketch screen layer.</p>
+                    <ul class="styled-list">
+                        <li><strong>Camera Tracking:</strong> Using overhead Depth Cameras (Azure Kinect, Intel RealSense).</li>
+                        <li><strong>Optical Flow:</strong> Blob data fed into TouchDesigner creates a virtual brush to erase the mask layer.</li>
+                        <li><strong>Optimization:</strong> Background subtraction to identify only humans.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Block 3: Lion King -->
+            <div class="content-block two-column">
+                <div>
+                    <h2 class="slide-title">The Lion King:<br><span class="gold-glow">Music in the Jungle</span></h2>
+                    <p style="margin-bottom: 20px;">The Jungle zone requires players to hit tree-trunk drums in sync to trigger lights and visuals.</p>
+                    <ul class="styled-list">
+                        <li><strong>Hardware:</strong> Piezo sensors attached inside the drums create analog signals.</li>
+                        <li><strong>Microcontroller:</strong> Arduino reads signals, converts to MIDI standard.</li>
+                        <li><strong>A/V Sync:</strong> MIDI sent to Resolume/TouchDesigner to trigger video and LED Pixels.</li>
+                    </ul>
+                </div>
+                <div class="image-wrapper" style="background: rgba(255, 215, 0, 0.05); border-color: #FFD700;">
+                    <iframe src="https://drive.google.com/file/d/1OSOyD2Ot42mzzUEc5Y4-ckw6BgpEfXEf/preview" width="100%" height="100%" style="border: none; border-radius: 14px;" allow="autoplay"></iframe>
+                </div>
+            </div>
+
+            <!-- Block 4: Frozen -->
+            <div class="content-block two-column">
+                <div class="image-wrapper desktop-invert" style="order: -1; background: rgba(93, 226, 255, 0.05); border-color: #5DE2FF;"> 
+                    <iframe src="https://drive.google.com/file/d/1Oq0QbDmoenVoRIo9HaRn__isZWhHFFGj/preview" width="100%" height="100%" style="border: none; border-radius: 14px;" allow="autoplay"></iframe>
+                </div>
+                <div>
+                    <h2 class="slide-title">Frozen:<br><span class="cyan-glow">Reuniting with Olaf</span></h2>
+                    <p style="margin-bottom: 20px;"><strong>Core Experience:</strong> Players throw physical snowballs at the interactive ice wall, shattering it gradually to reveal Olaf.</p>
+                    <ul class="styled-list">
+                        <li><strong>Collision Detection:</strong> Scanning the wall surface with 2D Lidar (Hokuyo) creates an invisible "laser curtain".</li>
+                        <li><strong>Coordinate Calculation:</strong> When a snowball breaks the laser, Lidar returns exact (X, Y) touch coordinates.</li>
+                        <li><strong>Particle Physics:</strong> Coordinates sent via UDP to Unreal Engine. Spawns particle systems of shattered ice with realistic physics.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Block 5: Tiled Alice & Mickey -->
+            <div class="content-block">
+                <h2 class="slide-title" style="text-align: center; border-bottom: none;">Exploration & Rhythm</h2>
+                <div class="two-column tiled">
+                    <div class="glass-box">
+                        <h3>Alice in Wonderland</h3>
+                        <p style="margin-bottom: 15px;"><strong>Gameplay:</strong> Find hidden spots, use the "Friendship Medallion" to activate the Cheshire Cat.</p>
+                        <p><strong class="purple-glow">Tech R&D:</strong> Using <strong>RFID / NFC</strong> technology hidden behind decor walls. Readers send API commands via LAN to trigger Mapping video projection.</p>
+                    </div>
+                    <div class="glass-box">
+                        <h3>Mickey & Friends</h3>
+                        <p style="margin-bottom: 15px;"><strong>Gameplay:</strong> Dance Challenge, players dance following character silhouettes to score points.</p>
+                        <p><strong class="purple-glow">Tech R&D:</strong> Applying <strong>AI Pose Estimation</strong> (MediaPipe / Azure Kinect). Comparing bone joint angle vectors with sample animations for real-time scoring.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Block 6: SketchBot Station -->
+            <div class="content-block two-column">
+                <div>
+                    <h2 class="slide-title">Transition Zone:<br><span class="gold-glow">SketchBot Station</span></h2>
+                    <p style="margin-bottom: 20px;"><strong>Core Experience:</strong> A fun rest stop where guests take photos and receive a caricature portrait drawn live by a robotic arm.</p>
+                    <ul class="styled-list">
+                        <li><strong>AI Face Processing:</strong> Software captures and analyzes faces, converting them to vector line art.</li>
+                        <li><strong>Robotic Kinematics:</strong> G-code data controls a miniature industrial robotic arm drawing on paper in real-time.</li>
+                        <li><strong>Souvenir:</strong> Drawn on pre-printed Disney frame paper, a unique personalized gift.</li>
+                    </ul>
+                </div>
+                <div class="image-wrapper" style="background: rgba(0,0,0,0.5); border-color: #FFEA70;">
+                    <iframe src="https://drive.google.com/file/d/1MQw9FLzkS2Prhn1SJdSq8ITPCwzmyRBX/preview" width="100%" height="100%" style="border: none; border-radius: 14px;" allow="autoplay"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section id="control-apps">
+            <div class="section-header">
+                <h2 class="gold-glow">Part 2: Control Systems</h2>
+                <hr>
+                <p class="subtitle">Comprehensive management app ecosystem: From payment, zone control to central technical processing (Core Show Control).</p>
+            </div>
+
+            <!-- Slide 2.1: App Payment -->
+            <div class="content-block two-column">
+                <div>
+                    <h2 class="slide-title">1. Currency Management:<br><span class="gold-glow">App Payment & Medallion</span></h2>
+                    <p style="margin-bottom: 20px;"><strong>Core:</strong> Payment and top-up system (Coin/Credit) for the interactive necklace (Friendship Medallion).</p>
+                    <ul class="styled-list">
+                        <li><strong>Multi-channel Coin Top-up:</strong> Integrating payment APIs (Momo, VNPay, Visa) at Kiosks/Ticketing booths to buy Credit.</li>
+                        <li><strong>Write Data RFID:</strong> App to scan and directly write balance and customer ID onto the built-in NFC/RFID chip in the Medallion.</li>
+                        <li><strong>Cloud Sync:</strong> Synchronize transaction history (e.g., Gacha plays, buying drinks at The Hunny Pot Cafe) to the Cloud system (Firebase/AWS) in real-time.</li>
+                    </ul>
+                </div>
+                <div class="image-wrapper" style="background: rgba(255, 215, 0, 0.05); border-color: #FFD700;">
+                    <iframe src="https://drive.google.com/file/d/1mjtiEzoAlADOVGT2SH5Zw5cTFu6eSUdh/preview" width="100%" height="100%" style="border: none; border-radius: 14px;" allow="autoplay"></iframe>
+                </div>
+            </div>
+
+            <!-- Slide 2.2: App Zone Manager -->
+            <div class="content-block two-column">
+                <div class="image-wrapper desktop-invert" style="order: -1; background: rgba(138, 43, 226, 0.05); border-color: #D47BFF;">
+                    <iframe src="https://drive.google.com/file/d/10_43lYDxk4DFqrXmmQfhwgDn9Z1bG1dX/preview" width="100%" height="100%" style="border: none; border-radius: 14px;" allow="autoplay"></iframe>
+                </div>
+                <div>
+                    <h2 class="slide-title">2. Zone Operations:<br><span class="purple-glow">App Zone Manager</span></h2>
+                    <p style="margin-bottom: 20px;"><strong>Role:</strong> Intuitive control interface (UI/UX) on Tablet/PC for operators at each zone.</p>
+                    <ul class="styled-list">
+                        <li><strong>Power Management:</strong> All-in-one button to turn on/off all projectors, screens, and station PCs via LAN (Wake-on-LAN, PJLink).</li>
+                        <li><strong>Scene Transition:</strong> Control game flow smoothly. Example: Transition from 'Waiting Scene' -> 'Start Game' -> 'End & Receive Gem'.</li>
+                        <li><strong>Health Dashboard:</strong> Monitor device operational status, track sensors, and alert on network disconnection.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Slide 2.3: App Core Show Control -->
+            <div class="content-block two-column">
+                <div>
+                    <h2 class="slide-title">3. Heart of the System:<br><span class="cyan-glow">App Show Control</span></h2>
+                    <p style="margin-bottom: 20px;"><strong>Role:</strong> Background application running on the Server, processing deep technical logic and syncing all hardware signals.</p>
+                    <ul class="styled-list">
+                        <li><strong>Mapping & Sensor Calib:</strong> Contains tools for sensor calibration (Lidar, Depth Camera) and Projection Mapping adjustment (Warping/Blending).</li>
+                        <li><strong>Lighting Trigger:</strong> Outputs standard DMX / Art-Net signals to control LED lights, syncing intensity precisely with the Game rhythm.</li>
+                        <li><strong>Mechanical Systems (SFX):</strong> Sends triggers (Relay, TCP/OSC) to auto open/close curtains, lifting motors, smoke/wind machines for practical effects.</li>
+                    </ul>
+                </div>
+                <div class="image-wrapper" style="background: rgba(93, 226, 255, 0.05); border-color: #5DE2FF;">
+                    <iframe src="https://drive.google.com/file/d/1VgpDbiWbFvaamdk502jIp9kbcqI_m6LB/preview" width="100%" height="100%" style="border: none; border-radius: 14px;" allow="autoplay"></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section id="trends">
+            <div class="section-header">
+                <h2 class="purple-glow">Part 3: Social Media Trends & R&D</h2>
+                <hr>
+                <p class="subtitle">Researching trending videos on social media, understanding Core Tech, and assessing feasibility for upcoming Shows.</p>
+            </div>
+
+            <div class="content-block">
+                <h2 class="slide-title">Latest R&D Ideas</h2>
+                <div class="tiled-content">
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                        <h3 class="gold-glow" style="font-size: 24px;">AI Avatar Kiosks</h3>
+                        <p style="margin-bottom: 15px;">Customers scan their faces and get a personalized avatar image. A massive trend on TikTok.</p>
+                        <p><span class="code-text">ComfyUI + Stable Diffusion</span></p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-water"></i></div>
+                        <h3 class="gold-glow" style="font-size: 24px;">Lidar Particle Floors</h3>
+                        <p style="margin-bottom: 15px;">Interactive floor creating ultra-smooth Fluid light trails following footsteps. Highly viral on Reels.</p>
+                        <p><span class="code-text">Unreal Engine + 2D Lidar</span></p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                        <h3 class="gold-glow" style="font-size: 24px;">WebAR Multiplayer</h3>
+                        <p style="margin-bottom: 15px;">Group-shared AR experience without an app. Hunting hidden items in the waiting area.</p>
+                        <p><span class="code-text">8th Wall + WebSockets</span></p>
+                    </div>
+                    <div class="tile">
+                        <div class="icon"><i class="fa-solid fa-video"></i></div>
+                        <h3 class="gold-glow" style="font-size: 24px;">Real-time AI Video</h3>
+                        <p style="margin-bottom: 15px;">Interactive drawing or taking camera feeds to transform into AI videos in real-time.</p>
+                        <p><span class="code-text">ComfyUI + StreamDiffusion</span></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="content-block">
+                <h2 class="slide-title">Video Demos: <span class="cyan-glow">Interactive Tech Trends</span></h2>
+                <div class="tiled-content">
+                    <div class="glass-box" style="padding: 25px;">
+                        <div class="image-wrapper" style="height: 220px; margin-bottom: 20px; border-radius: 12px; border: 1px solid rgba(255,215,0,0.4); box-shadow: none;">
+                            <iframe src="https://drive.google.com/file/d/1by4Q9fWaUZUOIPSwxA3DHZf6DsDz-tI7/preview" width="100%" height="100%" style="border: none;" allow="autoplay"></iframe>
+                        </div>
+                        <h3 class="gold-glow" style="font-size: 22px;">Laser & Mapping</h3>
+                        <p style="font-size: 15px; margin-bottom: 15px;">Using IR (Infrared) wands to interact. Pointing anywhere instantly creates laser and mapping effects at that spot.</p>
+                        <p><span class="code-text" style="font-size: 13px;">IR Camera + Laser Controller</span></p>
+                    </div>
+                    
+                    <div class="glass-box" style="padding: 25px;">
+                        <div class="image-wrapper" style="height: 220px; margin-bottom: 20px; border-radius: 12px; border: 1px solid rgba(212,123,255,0.4); box-shadow: none;">
+                            <iframe src="https://drive.google.com/file/d/1Z81T8isUpEz2SARY8vWRqMOUGtFVBf47/preview" width="100%" height="100%" style="border: none;" allow="autoplay"></iframe>
+                        </div>
+                        <h3 class="purple-glow" style="font-size: 22px;">Depth Cam Interactive</h3>
+                        <p style="font-size: 15px; margin-bottom: 15px;">Players jump and use their bodies to interact directly with virtual images or objects projected on the large screen.</p>
+                        <p><span class="code-text" style="font-size: 13px;">Azure Kinect + TouchDesigner</span></p>
+                    </div>
+                    
+                    <div class="glass-box" style="padding: 25px;">
+                        <div class="image-wrapper" style="height: 220px; margin-bottom: 20px; border-radius: 12px; border: 1px solid rgba(93,226,255,0.4); box-shadow: none;">
+                            <iframe src="https://drive.google.com/file/d/1alCnXv6RBDh1D_J62k5b2AoqydFx2IkM/preview" width="100%" height="100%" style="border: none;" allow="autoplay"></iframe>
+                        </div>
+                        <h3 class="cyan-glow" style="font-size: 22px;">Web Game & Mapping</h3>
+                        <p style="font-size: 15px; margin-bottom: 15px;">Scan QR code to access web-app. Phone becomes a controller to maneuver characters interacting with the giant projection.</p>
+                        <p><span class="code-text" style="font-size: 13px;">Node.js (WebSockets) + HTML5</span></p>
+                    </div>
+
+                    <div class="glass-box" style="padding: 25px;">
+                        <div class="image-wrapper" style="height: 220px; margin-bottom: 20px; border-radius: 12px; border: 1px solid rgba(255,90,95,0.4); box-shadow: none;">
+                            <iframe src="https://drive.google.com/file/d/117GfTi-jxHV4oovzH-g7-rLRsRSYhgWD/preview" width="100%" height="100%" style="border: none;" allow="autoplay"></iframe>
+                        </div>
+                        <h3 class="purple-glow" style="font-size: 22px;">Real-time AI Video</h3>
+                        <p style="font-size: 15px; margin-bottom: 15px;">Draw using AI to generate real-time video, taking camera feeds and using AI to transform into desired videos (Video-to-Video).</p>
+                        <p><span class="code-text" style="font-size: 13px;">Webcam + ComfyUI/LCM</span></p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Gemini API Assistant Feature -->
+        <section id="ai-assistant">
+            <div class="section-header">
+                <h2 class="slide-title" style="text-align: center; border-bottom: none;">✨ AI R&D Assistant <span class="purple-glow">(Brainstorming)</span></h2>
+            </div>
+            <div class="ai-generator-container glass-box">
+                <p class="subtitle" style="font-size: 18px; text-align: left; margin: 0 0 10px 0;">Enter a movie IP or theme for the AI to propose a suitable hardware interactive game:</p>
+                <div class="ai-input-group">
+                    <input type="text" id="ai-theme-input" class="ai-input" placeholder="Ex: Tron Legacy, Moana, Marvel, Space..." onkeypress="handleKeyPress(event)">
+                    <button id="ai-generate-btn" class="ai-button" onclick="generateGameIdea()">✨ Generate Idea</button>
+                </div>
+                <div id="ai-output" class="ai-output">
+                    <p class="chart-summary" style="margin-top: 60px; text-align: center;">No ideas generated yet. Try entering a theme and pressing the button!</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <h2 class="gold-glow">Q&A</h2>
+        <p>Next Phase: Prototype Deployment at R&D Lab.</p>
+        <div class="contact-info">
+            ✦ R&D Interactive Tech Team ✦
+        </div>
+    </footer>
+
+<script>
+    // Live Edit Feature: Automatically add contenteditable="true" to text tags
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll('h1, h2, h3, p:not(.subtitle), .subtitle, li, th, td').forEach(el => {
+            el.setAttribute('contenteditable', 'true');
+        });
+    });
+
+    // Gemini API Call Feature
+    const apiKey = "";
+    const model = "gemini-2.5-flash-preview-09-2025";
+
+    async function fetchWithRetry(url, options, maxRetries = 5) {
+        const delays = [1000, 2000, 4000, 8000, 16000];
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                if (i === maxRetries - 1) throw error;
+                await new Promise(resolve => setTimeout(resolve, delays[i]));
+            }
+        }
+    }
+
+    function parseMarkdown(text) {
+        let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        html = html.replace(/\n/g, '<br>');
+        return html;
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') generateGameIdea();
+    }
+
+    async function generateGameIdea() {
+        const inputEl = document.getElementById('ai-theme-input');
+        const btnEl = document.getElementById('ai-generate-btn');
+        const outputEl = document.getElementById('ai-output');
+        const theme = inputEl.value.trim();
+
+        if (!theme) {
+            outputEl.innerHTML = '<p style="color: #FF5A5F; text-align: center; margin-top: 60px;">Please enter a theme first!</p>';
+            return;
+        }
+
+        inputEl.disabled = true;
+        btnEl.disabled = true;
+        btnEl.innerHTML = '<span class="spinner"></span> Thinking...';
+        outputEl.innerHTML = '<p class="chart-summary" style="margin-top: 60px; text-align: center;">Connecting to AI Assistant (Gemini)...</p>';
+
+        const promptText = `You are an R&D expert and interactive spatial experience designer. 
+        Based on the theme: "${theme}", create 1 indoor interactive game idea. 
+        Present it very concisely in English using the following format:
+        **Game Name:** [Idea Name]
+        **Core Experience:** [Brief description of what players will do]
+        **Hardware/Sensors:** [List devices like Lidar, Kinect, RFID...]
+        **Software/Game Engine:** [List software like Unreal, TouchDesigner...]`;
+
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+        
+        const payload = {
+            contents: [{ parts: [{ text: promptText }] }],
+            systemInstruction: { parts: [{ text: "Respond concisely, focusing on technical and interactive game design in English." }] }
+        };
+
+        try {
+            const data = await fetchWithRetry(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (data.candidates && data.candidates[0].content.parts[0].text) {
+                const responseText = data.candidates[0].content.parts[0].text;
+                outputEl.innerHTML = parseMarkdown(responseText);
+            } else {
+                throw new Error("Invalid response format from API");
+            }
+        } catch (error) {
+            console.error(error);
+            outputEl.innerHTML = `<p style="color: #FF5A5F; text-align: center; margin-top: 60px;">An error occurred while connecting to the API. Please try again later.</p>`;
+        } finally {
+            inputEl.disabled = false;
+            btnEl.disabled = false;
+            btnEl.innerHTML = '✨ Generate Idea';
+            inputEl.focus();
+        }
+    }
+</script>
+</body>
+</html>
