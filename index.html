@@ -860,9 +860,9 @@
     </footer>
 
 <script>
-    // Live Edit Feature: Automatically add contenteditable="true" to text tags
+    // Live Edit Feature: Automatically add contenteditable="true" to text tags, but exclude navigation menu
     document.addEventListener("DOMContentLoaded", function() {
-        document.querySelectorAll('h1, h2, h3, p:not(.subtitle), .subtitle, li, th, td').forEach(el => {
+        document.querySelectorAll('h1, h2, h3, p:not(.subtitle), .subtitle, li:not(nav li), th, td').forEach(el => {
             el.setAttribute('contenteditable', 'true');
         });
     });
